@@ -64,8 +64,4 @@ stages:
     - task: SonarCloudAnalyze@3
       displayName: 'SonarQube: Analyze'
 
-    - task: SonarCloudPublish@3
-      displayName: 'SonarQube: Publish Quality Gate'
-      continueOnError: true
-      inputs:
-        pollingTimeoutSec: '300'
+    
