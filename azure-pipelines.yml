@@ -45,5 +45,26 @@ stages:
   jobs:
   - job: Conditioned
     steps:
-    - script: echo "Running on branch $(Build.SourceBranchName), version $(version)"
-      displayName: 'Check condition'
+    - task: UseDotNet@2
+      displayName: 'Install .NET 10 SDK'
+      inputs:
+        version: '10.x'
+    - task: SonarCloudPrepare@3
+      displayName: 'SonarQube: Prepare'
+      inputs:
+        SonarCloud: 'sonar-connection'
+        organization: 'vitaliyyashnikov'
+        scannerMode: 'dotnet'
+        projectKey: 'VitaliyYashnikov_HelloWorld'
+        projectName: 'HelloWorld'
+
+    - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
+      displayName: 'Build'
+
+    - task: SonarCloudAnalyze@3
+      displayName: 'SonarQube: Analyze'
+
+    - task: SonarCloudPublish@3
+      displayName: 'SonarQube: Publish Quality Gate'
+      inputs:
+        pollingTimeoutSec: '300'
