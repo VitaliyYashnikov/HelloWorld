@@ -58,6 +58,7 @@ stages:
         projectKey: 'VitaliyYashnikov_HelloWorld'
         projectName: 'HelloWorld'
 
+
     - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
       displayName: 'Build'
 
