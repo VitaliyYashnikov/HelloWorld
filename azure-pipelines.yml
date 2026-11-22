@@ -9,10 +9,10 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  version: 1.0.$(Build.BuildId)
+  
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
 - task: UseDotNet@2
   inputs:
     version: '10.x'
