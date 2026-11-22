@@ -65,4 +65,4 @@ stages:
     - task: SonarCloudAnalyze@3
       displayName: 'SonarQube: Analyze'
 
-    
+
