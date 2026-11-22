@@ -1,34 +1,49 @@
-
 trigger:
-- main
+  branches:
+    include:
+      - main
+      - feature
 
 pool:
   vmImage: ubuntu-latest
 
 variables:
   version: 1.0.$(Build.BuildId)
-  
-steps:
-- task: UseDotNet@2
-  inputs:
-    version: '10.x'
 
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    steps:
+    - task: UseDotNet@2
+      displayName: 'Install .NET 10 SDK'
+      inputs:
+        version: '10.x'
 
-- script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
-  displayName: 'Build'
+    - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
+      displayName: 'Build'
 
-- script: dotnet run --project HelloWorld.csproj -c Release --no-build
-  displayName: 'Run (print version)'
-  
-- script: dotnet publish HelloWorld.csproj -c Release -p:Version=$(version) -o $(Build.ArtifactStagingDirectory)/app
-  displayName: 'Publish'
-  
-- task: UniversalPackages@0
-  displayName: 'Upload to Azure Artifacts'
-  inputs:
-    command: publish
-    publishDirectory: '$(Build.ArtifactStagingDirectory)/app'
-    vstsFeedPublish: 'vitaliyyashnikov/HelloWorldArtifacts'
-    vstsFeedPackagePublish: 'helloworld'
-    versionOption: custom
-    versionPublish: '$(version)'
+    - script: dotnet run --project HelloWorld.csproj -c Release --no-build
+      displayName: 'Run (print version)'
+
+    - script: dotnet publish HelloWorld.csproj -c Release -p:Version=$(version) -o $(Build.ArtifactStagingDirectory)/app
+      displayName: 'Publish'
+
+    - task: UniversalPackages@0
+      displayName: 'Upload to Azure Artifacts'
+      inputs:
+        command: publish
+        publishDirectory: '$(Build.ArtifactStagingDirectory)/app'
+        vstsFeedPublish: 'vitaliyyashnikov/HelloWorldArtifacts'
+        vstsFeedPackagePublish: 'helloworld'
+        versionOption: custom
+        versionPublish: '$(version)'
+
+- stage: Conditioned
+  dependsOn: Build
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/feature'))
+  jobs:
+  - job: Conditioned
+    steps:
+    - script: echo "Running on branch $(Build.SourceBranchName), version $(version)"
+      displayName: 'Check condition'
