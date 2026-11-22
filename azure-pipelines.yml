@@ -17,5 +17,8 @@ steps:
 - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
   displayName: 'Build'
 
+- script: dotnet publish HelloWorld.csproj -c Release -p:Version=$(version) -o $(Build.ArtifactStagingDirectory)/app
+  displayName: 'Publish'
+
 - script: dotnet run --project HelloWorld.csproj -c Release --no-build
   displayName: 'Run (print version)'
