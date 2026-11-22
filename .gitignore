@@ -1,4 +1,4 @@
 *
-!.gitignore
-!HellowWorld.csproj
-!Program.cs
+!/.gitignore
+!/HellowWorld.csproj
+!/Program.cs
