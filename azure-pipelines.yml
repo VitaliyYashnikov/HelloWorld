@@ -12,9 +12,9 @@ steps:
 - task: UseDotNet@2
   inputs:
     version: '10.x'
-- script: pwd
 
-- script: dotnet build HelloWorld/HelloWorld.csproj -c Release -p:Version=$(version)
+
+- script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
   displayName: 'Build'
 
 - script: dotnet run --project HelloWorld/HelloWorld.csproj -c Release --no-build
