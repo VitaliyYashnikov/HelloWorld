@@ -17,5 +17,5 @@ steps:
 - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
   displayName: 'Build'
 
-- script: dotnet run --project HelloWorld/HelloWorld.csproj -c Release --no-build
+- script: dotnet run --project HelloWorld.csproj -c Release --no-build
   displayName: 'Run (print version)'
