@@ -64,7 +64,7 @@ stages:
     - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
       displayName: 'Build'
 
-    - script: dotnet test HelloWorld.Tests/HelloWorld.Tests.csproj -c Release --collect "XPlat Code Coverage" -- DataCollectionRunSettings.DataCollector.Configuration.Format=opencover
+    - script: dotnet test HelloWorld.Tests/HelloWorld.Tests.csproj -c Release --collect "XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
       displayName: 'Run tests with coverage'
 
     - task: SonarCloudAnalyze@4.4.0
