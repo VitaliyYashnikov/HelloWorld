@@ -20,22 +20,8 @@ stages:
       inputs:
         version: '10.x'
 
-    - task: SonarCloudPrepare@4
-      displayName: 'SonarQube: Prepare'
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-      inputs:
-        SonarQube: 'sonar-connection'
-        organization: 'vitaliyyashnikov'
-        scannerMode: 'dotnet'
-        projectKey: 'VitaliyYashnikov_HelloWorld'
-        projectName: 'HelloWorld'
-
     - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
       displayName: 'Build'
-
-    - task: SonarCloudAnalyze@4
-      displayName: 'SonarQube: Analyze'
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
     - script: dotnet run --project HelloWorld.csproj -c Release --no-build
       displayName: 'Run (print version)'
@@ -64,26 +50,31 @@ stages:
       inputs:
         version: '10.x'
 
+    - task: SonarCloudPrepare@4
+      displayName: 'SonarQube: Prepare'
+      inputs:
+        SonarQube: 'sonar-connection'
+        organization: 'vitaliyyashnikov'
+        scannerMode: 'dotnet'
+        projectKey: 'VitaliyYashnikov_HelloWorld'
+        projectName: 'HelloWorld'
+        extraProperties: |
+          sonar.qualitygate.wait=true
+
     - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
       displayName: 'Build'
 
-    - script: dotnet pack HelloWorld.csproj -c Release --no-build -p:PackageId=$(Build.SourceBranchName)_$(version) -p:PackageVersion=$(version) -o $(Build.ArtifactStagingDirectory)/nuget
+    - task: SonarCloudAnalyze@4
+      displayName: 'SonarQube: Analyze'
+
+    - script: dotnet pack HelloWorld.csproj -c Release --no-build -p:PackageId="${BRANCH}_${VERSION}" -p:PackageVersion="$VERSION" -o $(Build.ArtifactStagingDirectory)/nuget
       displayName: 'Create NuGet package'
+      env:
+        BRANCH: $(Build.SourceBranchName)
+        VERSION: $(version)
 
     - task: DotNetCoreCLI@2
       displayName: 'Push NuGet to Azure Artifacts'
       inputs:
         command: push
-        packagesToPush: '$(Build.ArtifactStagingDirectory)/nuget/*.nupkg'
-        nuGetFeedType: internal
-        publishVstsFeed: 'vitaliyyashnikov/HelloWorldArtifacts'
-
-    - script: |
-        echo "Version: $(version)"
-        echo "##vso[build.addbuildtag]$(Build.SourceBranchName)_$(version)"
-      displayName: 'Print version and add tag'
-
-    - script: |
-        cat > mail.txt <<EOF
-        From: $SMTP_USER
-        To: $MAIL_TO
+        packagesToPush:
