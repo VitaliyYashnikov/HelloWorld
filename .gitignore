@@ -1,5 +1,5 @@
 *
 !/.gitignore
 !/HelloWorld.csproj
-!/Program.cs
+!/*.cs
 !/azure-pipelines.yml
