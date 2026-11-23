@@ -48,6 +48,9 @@ stages:
         projectKey: 'VitaliyYashnikov_HelloWorld'
         projectName: 'HelloWorld'
 
+    - task: SonarCloudAnalyze@3
+      displayName: 'SonarQube: Analyze'
+
 - stage: Conditioned
   dependsOn: Build
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/feature'))
@@ -64,8 +67,7 @@ stages:
     - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
       displayName: 'Build'
 
-    - task: SonarCloudAnalyze@3
-      displayName: 'SonarQube: Analyze'
+
 
     - script: dotnet pack HelloWorld.csproj -c Release --no-build -p:PackageId=$(Build.SourceBranchName)_$(version) -p:PackageVersion=$(version) -o $(Build.ArtifactStagingDirectory)/nuget
       displayName: 'Create NuGet package'
