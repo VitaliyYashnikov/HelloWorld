@@ -39,6 +39,15 @@ stages:
         versionOption: custom
         versionPublish: '$(version)'
 
+    - task: SonarCloudPrepare@3
+      displayName: 'SonarQube: Prepare'
+      inputs:
+        SonarCloud: 'sonar-connection'
+        organization: 'vitaliyyashnikov'
+        scannerMode: 'dotnet'
+        projectKey: 'VitaliyYashnikov_HelloWorld'
+        projectName: 'HelloWorld'
+
 - stage: Conditioned
   dependsOn: Build
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/feature'))
@@ -49,14 +58,7 @@ stages:
       displayName: 'Install .NET 10 SDK'
       inputs:
         version: '10.x'
-    - task: SonarCloudPrepare@3
-      displayName: 'SonarQube: Prepare'
-      inputs:
-        SonarCloud: 'sonar-connection'
-        organization: 'vitaliyyashnikov'
-        scannerMode: 'dotnet'
-        projectKey: 'VitaliyYashnikov_HelloWorld'
-        projectName: 'HelloWorld'
+    
 
 
     - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
