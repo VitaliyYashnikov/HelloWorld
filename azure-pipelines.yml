@@ -65,7 +65,7 @@ stages:
     - task: SonarCloudAnalyze@3
       displayName: 'SonarQube: Analyze'
 
-    - script: dotnet pack HelloWorld.csproj -c Release --no-build -p:PackageVersion=$(version) -o $(Build.ArtifactStagingDirectory)/nuget
+    - script: dotnet pack HelloWorld.csproj -c Release --no-build -p:PackageId=$(Build.SourceBranchName)_$(version) -p:PackageVersion=$(version) -o $(Build.ArtifactStagingDirectory)/nuget
       displayName: 'Create NuGet package'
 
     - task: DotNetCoreCLI@2
