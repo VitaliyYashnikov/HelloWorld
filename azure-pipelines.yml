@@ -50,7 +50,7 @@ stages:
       inputs:
         version: '10.x'
 
-    - task: SonarCloudPrepare@4
+    - task: SonarCloudPrepare@4.4.0
       displayName: 'SonarQube: Prepare'
       inputs:
         SonarQube: 'sonar-connection'
@@ -64,7 +64,7 @@ stages:
     - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
       displayName: 'Build'
 
-    - task: SonarCloudAnalyze@4
+    - task: SonarCloudPrepare@4.4.0
       displayName: 'SonarQube: Analyze'
 
     - script: dotnet pack HelloWorld.csproj -c Release --no-build -p:PackageId="${BRANCH}_${VERSION}" -p:PackageVersion="$VERSION" -o $(Build.ArtifactStagingDirectory)/nuget
