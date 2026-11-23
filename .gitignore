@@ -6,3 +6,4 @@
 !HelloWorld.Tests/
 !HelloWorld.Tests/*.cs
 !HelloWorld.Tests/*.csproj
+!README.md
