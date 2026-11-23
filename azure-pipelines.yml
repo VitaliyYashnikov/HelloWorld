@@ -45,6 +45,9 @@ stages:
   jobs:
   - job: Conditioned
     steps:
+    - checkout: self
+      fetchDepth: 0
+
     - task: UseDotNet@2
       displayName: 'Install .NET 10 SDK'
       inputs:
@@ -60,11 +63,13 @@ stages:
         projectName: 'HelloWorld'
         extraProperties: |
           sonar.qualitygate.wait=true
+          sonar.cs.opencover.reportsPaths=$(Agent.TempDirectory)/coverage/**/coverage.opencover.xml
+          sonar.coverage.exclusions=Program.cs
 
     - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
       displayName: 'Build'
 
-    - script: dotnet test HelloWorld.Tests/HelloWorld.Tests.csproj -c Release --collect "XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+    - script: dotnet test HelloWorld.Tests/HelloWorld.Tests.csproj -c Release --collect "XPlat Code Coverage" --results-directory $(Agent.TempDirectory)/coverage -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
       displayName: 'Run tests with coverage'
 
     - task: SonarCloudAnalyze@4.4.0
@@ -80,4 +85,12 @@ stages:
       displayName: 'Push NuGet to Azure Artifacts'
       inputs:
         command: push
-        packagesToPush:
+        packagesToPush: '$(Build.ArtifactStagingDirectory)/nuget/*.nupkg'
+        nuGetFeedType: internal
+        publishVstsFeed: 'vitaliyyashnikov/HelloWorldArtifacts'
+
+    - script: 'echo "Version: $(version)"'
+      displayName: 'Print version'
+
+    - script: echo "##vso[build.addbuildtag]$(Build.SourceBranchName)_$(version)"
+      displayName: 'Add tag'
