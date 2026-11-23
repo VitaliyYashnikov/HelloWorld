@@ -58,9 +58,7 @@ stages:
         scannerMode: 'dotnet'
         projectKey: 'VitaliyYashnikov_HelloWorld'
         projectName: 'HelloWorld'
-        extraProperties: |
-          sonar.qualitygate.wait=true
-
+        
     - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
       displayName: 'Build'
 
