@@ -49,29 +49,32 @@ stages:
       displayName: 'Install .NET 10 SDK'
       inputs:
         version: '10.x'
-    - task: SonarCloudPrepare@3
+
+    - task: SonarCloudPrepare@4
       displayName: 'SonarQube: Prepare'
       inputs:
-        SonarCloud: 'sonar-connection'
+        SonarQube: 'sonar-connection'
         organization: 'vitaliyyashnikov'
         scannerMode: 'dotnet'
         projectKey: 'VitaliyYashnikov_HelloWorld'
         projectName: 'HelloWorld'
-
+        extraProperties: |
+          sonar.qualitygate.wait=true
 
     - script: dotnet build HelloWorld.csproj -c Release -p:Version=$(version)
       displayName: 'Build'
 
-    - task: SonarCloudAnalyze@3
+    - task: SonarCloudAnalyze@4
       displayName: 'SonarQube: Analyze'
 
-    - script: dotnet pack HelloWorld.csproj -c Release --no-build -p:PackageId=$(Build.SourceBranchName)_$(version) -p:PackageVersion=$(version) -o $(Build.ArtifactStagingDirectory)/nuget
+    - script: dotnet pack HelloWorld.csproj -c Release --no-build -p:PackageId="${BRANCH}_${VERSION}" -p:PackageVersion="$VERSION" -o $(Build.ArtifactStagingDirectory)/nuget
       displayName: 'Create NuGet package'
+      env:
+        BRANCH: $(Build.SourceBranchName)
+        VERSION: $(version)
 
     - task: DotNetCoreCLI@2
       displayName: 'Push NuGet to Azure Artifacts'
       inputs:
         command: push
-        packagesToPush: '$(Build.ArtifactStagingDirectory)/nuget/*.nupkg'
-        nuGetFeedType: internal
-        publishVstsFeed: 'vitaliyyashnikov/HelloWorldArtifacts'
+        packagesToPush:
