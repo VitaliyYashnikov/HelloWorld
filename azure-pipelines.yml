@@ -65,4 +65,13 @@ stages:
     - task: SonarCloudAnalyze@3
       displayName: 'SonarQube: Analyze'
 
-    
+    - script: dotnet pack HelloWorld.csproj -c Release --no-build -p:PackageVersion=$(version) -o $(Build.ArtifactStagingDirectory)/nuget
+      displayName: 'Create NuGet package'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Push NuGet to Azure Artifacts'
+      inputs:
+        command: push
+        packagesToPush: '$(Build.ArtifactStagingDirectory)/nuget/*.nupkg'
+        nuGetFeedType: internal
+        publishVstsFeed: 'vitaliyyashnikov/HelloWorldArtifacts'
