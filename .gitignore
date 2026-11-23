@@ -3,3 +3,6 @@
 !/HelloWorld.csproj
 !/*.cs
 !/azure-pipelines.yml
+!HelloWorld.Tests/
+!HelloWorld.Tests/*.cs
+!HelloWorld.Tests/*.csproj
