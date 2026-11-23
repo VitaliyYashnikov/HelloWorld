@@ -92,5 +92,8 @@ stages:
     - script: 'echo "Version: $(version)"'
       displayName: 'Print version'
 
-    - script: echo "##vso[build.addbuildtag]$(Build.SourceBranchName)_$(version)"
+    - script: echo "##vso[build.addbuildtag]${BRANCH}_${VERSION}"
       displayName: 'Add tag'
+      env:
+        BRANCH: $(Build.SourceBranchName)
+        VERSION: $(version)
